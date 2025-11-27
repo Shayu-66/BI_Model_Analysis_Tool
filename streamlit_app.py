@@ -53,12 +53,38 @@ class BIMParser:
     def parse_file(self, file_content: str) -> Dict:
         """解析BIM文件或TMSL脚本内容"""
         try:
-            
+            # 重置解析结果
+            self.raw_data = None
+            self.tables_info = []
+            self.columns_info = []
+            self.measures_info = []
+            self.relationships_info = []
+            self.overview_info = []
+
+            # 尝试将传入内容解析为 JSON（大部分 .bim / TMSL 为 JSON 格式）
+            try:
+                parsed = json.loads(file_content)
+            except Exception as e_json:
+                # 返回更友好的错误信息，便于调试上传/粘贴的问题
+                return {"success": False, "error": f"无法解析为JSON: {str(e_json)}"}
+
+            # 保存原始数据并逐步解析各部分
+            self.raw_data = parsed
+
+            # 填充解析信息
+            self._parse_tables()
+            self._parse_columns()
+            self._parse_measures()
+            self._parse_relationships()
+            self._generate_overview()
+            self._resolve_all_measure_references()
+
+            # 打印调试信息（在控制台可见）
             print(f"解析结果 - 表数量: {len(self.tables_info)}")
             print(f"解析结果 - 列数量: {len(self.columns_info)}")
             print(f"解析结果 - 度量值数量: {len(self.measures_info)}")
             print(f"解析结果 - 关系数量: {len(self.relationships_info)}")
-            
+
             return {
                 "success": True,
                 "tables": self.tables_info,
