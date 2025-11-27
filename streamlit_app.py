@@ -68,8 +68,39 @@ class BIMParser:
                 # 返回更友好的错误信息，便于调试上传/粘贴的问题
                 return {"success": False, "error": f"无法解析为JSON: {str(e_json)}"}
 
-            # 保存原始数据并逐步解析各部分
-            self.raw_data = parsed
+            # 试图定位模型对象：多数 .bim / TMSL JSON 包含一个名为 "model" 的子对象
+            def _locate_model(obj):
+                # 直接包含 model 键
+                if isinstance(obj, dict):
+                    if 'model' in obj and isinstance(obj['model'], dict):
+                        return obj['model']
+                    # 常见命名：SemanticModel
+                    if 'SemanticModel' in obj and isinstance(obj['SemanticModel'], dict):
+                        return obj['SemanticModel']
+                    # 如果当前对象看起来就是模型（包含 tables 键）
+                    if 'tables' in obj and isinstance(obj['tables'], list):
+                        return obj
+                    # 递归查找子对象
+                    for v in obj.values():
+                        if isinstance(v, (dict, list)):
+                            found = _locate_model(v)
+                            if found is not None:
+                                return found
+                elif isinstance(obj, list):
+                    for item in obj:
+                        if isinstance(item, (dict, list)):
+                            found = _locate_model(item)
+                            if found is not None:
+                                return found
+                return None
+
+            model_obj = _locate_model(parsed)
+            if model_obj is None:
+                # 如果没有找到模型对象，保留原始解析结果以便错误追踪
+                self.raw_data = parsed
+            else:
+                # 统一把 raw_data 设置为包含 model 键的结构，方便后续解析函数使用
+                self.raw_data = {'model': model_obj}
 
             # 填充解析信息
             self._parse_tables()
