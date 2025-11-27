@@ -1169,8 +1169,13 @@ def create_streamlit_app():
         
         with tab1:
             overview_df = pd.DataFrame(data['overview'])
-            
+
             if not overview_df.empty:
+                # 确保数值列为数值类型，避免按字符串排序
+                for _num_col in ['列数', '度量值数', '分区数']:
+                    if _num_col in overview_df.columns:
+                        overview_df[_num_col] = pd.to_numeric(overview_df[_num_col], errors='coerce').fillna(0).astype(int)
+
                 # 按表名列字母升序排序
                 overview_df = overview_df.sort_values(by='表名', ascending=True)
                 # 添加序号列
@@ -1241,8 +1246,8 @@ def create_streamlit_app():
                 # 配置列的宽度和类型
                 column_configs = {}
                 for col in overview_df.columns:
-                    if col == '序号':
-                        # 序号列配置为数字类型，确保正确排序
+                    if col in ['序号', '列数', '度量值数', '分区数']:
+                        # 数值列配置为数字类型，确保按数值排序
                         column_configs[col] = st.column_config.NumberColumn(
                             col,
                             width="small"
@@ -1252,7 +1257,7 @@ def create_streamlit_app():
                             col,
                             width="medium"
                         )
-                    elif col in ['分区数', '行数', '协议']:
+                    elif col in ['行数', '协议']:
                         column_configs[col] = st.column_config.TextColumn(
                             col,
                             width="small"
