@@ -1286,14 +1286,24 @@ def create_streamlit_app():
                     table_height = max_rows_without_scroll * row_height + header_height
                 
                 # 显示表格
-                st.dataframe(
-                    overview_df,
-                    use_container_width=True,
-                    hide_index=True,
-                    column_config=column_configs,
-                    key="overview_table",
-                    height=table_height
-                )
+                try:
+                    st.dataframe(
+                        overview_df,
+                        use_container_width=True,
+                        hide_index=True,
+                        column_config=column_configs,
+                        key="overview_table",
+                        height=table_height
+                    )
+                except Exception:
+                    # 兼容老版本 Streamlit：如果 column_config 不被支持则降级显示
+                    st.dataframe(
+                        overview_df,
+                        use_container_width=True,
+                        hide_index=True,
+                        key="overview_table",
+                        height=table_height
+                    )
             else:
                 st.warning("⚠️ 没有找到概览数据")
         
@@ -1376,14 +1386,23 @@ def create_streamlit_app():
                         )
                 
                 # 显示表格
-                st.dataframe(
-                    columns_df,
-                    use_container_width=True,
-                    hide_index=True,
-                    column_config=column_configs,
-                    key="columns_table",
-                    height=table_height
-                )
+                try:
+                    st.dataframe(
+                        columns_df,
+                        use_container_width=True,
+                        hide_index=True,
+                        column_config=column_configs,
+                        key="columns_table",
+                        height=table_height
+                    )
+                except Exception:
+                    st.dataframe(
+                        columns_df,
+                        use_container_width=True,
+                        hide_index=True,
+                        key="columns_table",
+                        height=table_height
+                    )
             else:
                 st.warning("⚠️ 没有找到列数据")
         
@@ -1461,14 +1480,23 @@ def create_streamlit_app():
                         )
                 
                 # 显示表格
-                st.dataframe(
-                    measures_df,
-                    use_container_width=True,
-                    hide_index=True,
-                    column_config=column_configs,
-                    key="measures_table",
-                    height=table_height
-                )
+                try:
+                    st.dataframe(
+                        measures_df,
+                        use_container_width=True,
+                        hide_index=True,
+                        column_config=column_configs,
+                        key="measures_table",
+                        height=table_height
+                    )
+                except Exception:
+                    st.dataframe(
+                        measures_df,
+                        use_container_width=True,
+                        hide_index=True,
+                        key="measures_table",
+                        height=table_height
+                    )
             else:
                 st.warning("⚠️ 没有找到度量值数据")
         
@@ -1554,14 +1582,23 @@ def create_streamlit_app():
                         )
                 
                 # 显示表格
-                st.dataframe(
-                    relationships_df,
-                    use_container_width=True,
-                    hide_index=True,
-                    column_config=column_configs,
-                    key="relationships_table",
-                    height=table_height
-                )
+                try:
+                    st.dataframe(
+                        relationships_df,
+                        use_container_width=True,
+                        hide_index=True,
+                        column_config=column_configs,
+                        key="relationships_table",
+                        height=table_height
+                    )
+                except Exception:
+                    st.dataframe(
+                        relationships_df,
+                        use_container_width=True,
+                        hide_index=True,
+                        key="relationships_table",
+                        height=table_height
+                    )
             else:
                 st.warning("⚠️ 没有找到关系数据")
             
